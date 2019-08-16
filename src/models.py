@@ -33,16 +33,16 @@ class User(db.Model):
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    purchase_date = db.Column(db.Integer(120), nullable=False)
-    confirmation_number = db.Column(db.Integer(120), nullable=False)
+    purchase_date = db.Column(db.Integer, nullable=False)
+    confirmation_number = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product = db.relationship('Products', backref='product', lazy=True)
+    products = db.relationship('Products', backref='orders', lazy=True)
 
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     plan_name = db.Column(db.String(30), unique=True, nullable=True)
-    price = db.Column(db.Integer(30), unique=True, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    price = db.Column(db.Integer, unique=True, nullable=False)
+    orders_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
 
 
 

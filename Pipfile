@@ -16,6 +16,7 @@ python-dotenv = "*"
 flask-cors = "*"
 gunicorn = "*"
 mysqlclient = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7.2"

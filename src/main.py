@@ -2,12 +2,14 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from fakePressure import data
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Person
+from models import db, User, Products, Orders, Magfield, Tempfield, Atmopressure, Axismeasure
+
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -25,10 +27,10 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/person', methods=['POST', 'GET'])
-def handle_person():
+@app.route('/user', methods=['POST', 'GET'])
+def handle_user():
     """
-    Create person and retrieve all persons
+    Create user and retrieve all users
     """
 
     # POST request
@@ -41,25 +43,97 @@ def handle_person():
             raise APIException('You need to specify the username', status_code=400)
         if 'email' not in body:
             raise APIException('You need to specify the email', status_code=400)
+        if 'orders' not in body:
+            raise APIException('You need to specify the orders', status_code=400)
+        if 'name' not in body:
+            raise APIException('You need to specify the name', status_code=400)
+        if 'isAdmin' not in body:
+            raise APIException('You need to specify the isAdmin', status_code=400)
+        if 'country' not in body:
+            raise APIException('You need to specify the country', status_code=400)
+        if 'state' not in body:
+            raise APIException('You need to specify the state', status_code=400)
+        if 'city' not in body:
+            raise APIException('You need to specify the city', status_code=400)
+        if 'address' not in body:
+            raise APIException('You need to specify the address', status_code=400)
+        if 'zipcode' not in body:
+            raise APIException('You need to specify the zipcode', status_code=400)
+        if 'password_hash' not in body:
+            raise APIException('You need to specify the password_hash', status_code=400)
 
-        user1 = Person(username=body['username'], email=body['email'])
+        user1 = User(username=body['username'], email=body['email'])
         db.session.add(user1)
         db.session.commit()
         return "ok", 200
 
     # GET request
     if request.method == 'GET':
-        all_people = Person.query.all()
-        all_people = list(map(lambda x: x.serialize(), all_people))
-        return jsonify(all_people), 200
+        all_user= User.query.all()
+        all_user = list(map(lambda x: x.serialize(), all_user))
+        return jsonify(all_user), 200
 
     return "Invalid Method", 404
 
 
-@app.route('/person/<int:person_id>', methods=['PUT', 'GET', 'DELETE'])
-def get_single_person(person_id):
+@app.route('/Orders', methods=['POST', 'GET'])
+def handle_orders():
+
+    if request.method == 'POST':
+        body = request.get_json()
+
+    if body is None:
+        raise APIException("You need to specify the request body as a json object", status_code=400)
+    if 'username' not in body:
+        raise APIException('You need to specify the username', status_code=400)
+    if 'purchase_date' not in body:
+        raise APIException('You need to specify the purchase_date', status_code=400)
+    if 'confirmation_number' not in body:
+        raise APIException('You need to specify the confirmation_number', status_code=400)
+    if 'user_id' not in body:
+        raise APIException('You need to specify the user_id', status_code=400)
+    if 'products' not in body:
+        raise APIException('You need to specify the products', status_code=400)
+
+
+@app.route('/products', methods=[ 'GET', 'POST'])
+def handle_products():
+
+    if request.method == 'POST':
+        body = request.get_json()
+
+    if body is None:
+        raise APIException("You need to specify the request body as a json object", status_code=400)
+    if 'plan_name' not in body:
+        raise APIException('You need to specify the plan_name', status_code=400)
+    if 'price' not in body:
+        raise APIException('You need to specify the price', status_code=400)
+    if 'orders_id' not in body:
+        raise APIException('You need to specify the orders_id', status_code=400)
+    if 'mag_f' not in body:
+        raise APIException('You need to specify the mag_f', status_code=400)
+    if 'temp' not in body:
+        raise APIException('You need to specify the temp', status_code=400)
+    if 'atmo_pressure' not in body:
+        raise APIException('You need to specify the atmo_pressure', status_code=400)
+    if 'axis_measure' not in body:
+        raise APIException('You need to specify the axis_measure', status_code=400)
+    return "Invalid Method", 404
+
+    if request.method == 'GET':
+        all_products = Products.query.all()
+        all_products = list(map(lambda x: x.serialize(), all_products))
+    return jsonify(all_products), 200
+
+
+
+
+
+
+@app.route('/products/<int:products_id>', methods=['PUT', 'GET', 'DELETE'])
+def get_single_user(products_id):
     """
-    Single person
+    Single products
     """
 
     # PUT request
@@ -68,9 +142,9 @@ def get_single_person(person_id):
         if body is None:
             raise APIException("You need to specify the request body as a json object", status_code=400)
 
-        user1 = Person.query.get(person_id)
+        user1 = User.query.get(products_id)
         if user1 is None:
-            raise APIException('User not found', status_code=404)
+            raise APIException('Products not found', status_code=404)
 
         if "username" in body:
             user1.username = body["username"]
@@ -82,22 +156,28 @@ def get_single_person(person_id):
 
     # GET request
     if request.method == 'GET':
-        user1 = Person.query.get(person_id)
+        products1 = Products.query.get(products_id)
         if user1 is None:
-            raise APIException('User not found', status_code=404)
-        return jsonify(user1.serialize()), 200
+            raise APIException('Products not found', status_code=404)
+        return jsonify(products1.serialize()), 200
 
     # DELETE request
     if request.method == 'DELETE':
-        user1 = Person.query.get(person_id)
-        if user1 is None:
-            raise APIException('User not found', status_code=404)
-        db.session.delete(user1)
+        products1 = Products.query.get(products_id)
+        if products1 is None:
+            raise APIException('Product not found', status_code=404)
+        db.session.delete(products1)
         db.session.commit()
         return "ok", 200
 
     return "Invalid Method", 404
 
+
+
+@app.route('/pressure', methods=['GET'])
+def get_single_all_data():
+
+    return jsonify(data)
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

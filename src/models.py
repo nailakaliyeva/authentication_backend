@@ -57,8 +57,6 @@ class Orders(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     products = db.relationship('Products', backref='orders', lazy=True)
 
-
-
     def __repr__(self):
         return '<Orders %r>' % self.purchase_date
 
@@ -76,10 +74,10 @@ class Products(db.Model):
     plan_name = db.Column(db.String(30), unique=True, nullable=True)
     price = db.Column(db.Integer, unique=True, nullable=False)
     orders_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
-    mag_f = db.relationship('Magfield', backref='magfield.id', lazy=True)
-    temp = db.relationship('Tempfield', backref='tempfield.id', lazy=True)
-    atmo_pressure = db.relationship('Atmopressure', backref='atmopressure.id', lazy=True)
-    axis_measure = db.relationship('Axismeasure', backref='axismeasure.id', lazy=True)
+    mag_f = db.relationship('Magfield', backref='product', lazy=True)
+    temp = db.relationship('Tempfield', backref='product', lazy=True)
+    atmo_pressure = db.relationship('Atmopressure', backref='product', lazy=True)
+    axis_measure = db.relationship('Axismeasure', backref='product', lazy=True)
 
     def __repr__(self):
         return '<Products %r>' % self.plan_name
@@ -103,6 +101,7 @@ class Magfield(db.Model):
     x_measure = db.Column(db.String(30), unique=True, nullable=False)
     y_measure = db.Column(db.String(30), unique=True, nullable=False)
     z_measure = db.Column(db.String(30), unique=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
     def __repr__(self):
         return '<Magfield %r>' % self.x_measure
@@ -119,6 +118,7 @@ class Magfield(db.Model):
 class Tempfield(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tempF = db.Column(db.Integer, unique=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
     def __repr__(self):
         return '<Tempfield %r>' % self.username
@@ -133,6 +133,7 @@ class Tempfield(db.Model):
 class Atmopressure(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     millibars = db.Column(db.Integer, unique=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
     def __repr__(self):
         return '<Atmopressure %r>' % self.millibars
@@ -148,6 +149,7 @@ class Axismeasure(db.Model):
     pitch = db.Column(db.Integer, unique=True, nullable=False)
     roll = db.Column(db.Integer, unique=True, nullable=False)
     yaw = db.Column(db.Integer, unique=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
     def __repr__(self):
         return '<Axismeasure %r>' % self.pitch

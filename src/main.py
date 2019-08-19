@@ -2,12 +2,14 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from fakePressure import data
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from models import db, User, Products, Orders, Magfield, Tempfield, Atmopressure, Axismeasure
+
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -59,12 +61,7 @@ def handle_user():
             raise APIException('You need to specify the zipcode', status_code=400)
         if 'password_hash' not in body:
             raise APIException('You need to specify the password_hash', status_code=400)
-        if 'x_measure' not in body:
-            raise APIException('You need to specify the x_measure', status_code=400)
-        if 'y_measure' not in body:
-            raise APIException('You need to specify the y_measure', status_code=400)
-        if 'z_measure' not in body:
-            raise APIException('You need to specify the z_measure', status_code=400)
+
         user1 = User(username=body['username'], email=body['email'])
         db.session.add(user1)
         db.session.commit()
@@ -72,9 +69,9 @@ def handle_user():
 
     # GET request
     if request.method == 'GET':
-        all_people = User.query.all()
-        all_people = list(map(lambda x: x.serialize(), all_people))
-        return jsonify(all_people), 200
+        all_user= User.query.all()
+        all_user = list(map(lambda x: x.serialize(), all_user))
+        return jsonify(all_user), 200
 
     return "Invalid Method", 404
 
@@ -99,20 +96,11 @@ def handle_orders():
         raise APIException('You need to specify the products', status_code=400)
 
 
-@app.route('/Products', methods=[ 'GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/products', methods=[ 'GET', 'POST'])
 def handle_products():
 
     if request.method == 'POST':
         body = request.get_json()
-
-    if request.method == 'GET':
-        all_products = Products.query.all()
-        all_products = list(map(lambda x: x.serialize(), all_products))
-        return jsonify(all_products), 200
-
-    return "Invalid Method", 404
-
-
 
     if body is None:
         raise APIException("You need to specify the request body as a json object", status_code=400)
@@ -130,13 +118,22 @@ def handle_products():
         raise APIException('You need to specify the atmo_pressure', status_code=400)
     if 'axis_measure' not in body:
         raise APIException('You need to specify the axis_measure', status_code=400)
+    return "Invalid Method", 404
+
+    if request.method == 'GET':
+        all_products = Products.query.all()
+        all_products = list(map(lambda x: x.serialize(), all_products))
+    return jsonify(all_products), 200
 
 
 
-@app.route('/user/<int:user_id>', methods=['PUT', 'GET', 'DELETE'])
-def get_single_user(user_id):
+
+
+
+@app.route('/products/<int:products_id>', methods=['PUT', 'GET', 'DELETE'])
+def get_single_user(products_id):
     """
-    Single user
+    Single products
     """
 
     # PUT request
@@ -145,9 +142,9 @@ def get_single_user(user_id):
         if body is None:
             raise APIException("You need to specify the request body as a json object", status_code=400)
 
-        user1 = User.query.get(user_id)
+        user1 = User.query.get(products_id)
         if user1 is None:
-            raise APIException('User not found', status_code=404)
+            raise APIException('Products not found', status_code=404)
 
         if "username" in body:
             user1.username = body["username"]
@@ -159,22 +156,28 @@ def get_single_user(user_id):
 
     # GET request
     if request.method == 'GET':
-        user1 = User.query.get(user_id)
+        products1 = Products.query.get(products_id)
         if user1 is None:
-            raise APIException('User not found', status_code=404)
-        return jsonify(user1.serialize()), 200
+            raise APIException('Products not found', status_code=404)
+        return jsonify(products1.serialize()), 200
 
     # DELETE request
     if request.method == 'DELETE':
-        user1 = User.query.get(user_id)
-        if user1 is None:
-            raise APIException('User not found', status_code=404)
-        db.session.delete(user1)
+        products1 = Products.query.get(products_id)
+        if products1 is None:
+            raise APIException('Product not found', status_code=404)
+        db.session.delete(products1)
         db.session.commit()
         return "ok", 200
 
     return "Invalid Method", 404
 
+
+
+@app.route('/pressure', methods=['GET'])
+def get_single_all_data():
+
+    return jsonify(data)
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

@@ -1,6 +1,9 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+from flask_jwt_simple import (
+    JWTManager, jwt_required, create_jwt, get_jwt_identity
+)
 import os
 from fakePressure import data
 from flask import Flask, request, jsonify, url_for
@@ -18,7 +21,32 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
+app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
+jwt = JWTManager(app)
 
+
+# Provide a method to create access tokens. The create_jwt()
+# function is used to actually generate the token
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    params = request.get_json()
+    email = params.get('email', None)
+    password = params.get('password', None)
+
+    if not email:
+        return jsonify({"msg": "Missing email parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    if email != 'test' or password != 'test':
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    # Identity can be any data that is json serializable
+    ret = {'jwt': create_jwt(identity=email)}
+    return jsonify(ret), 200
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
@@ -98,7 +126,7 @@ def handle_orders():
 
 @app.route('/products', methods=[ 'GET', 'POST'])
 def handle_products():
-    
+
     if request.method == 'POST':
         body = request.get_json()
 
@@ -175,6 +203,7 @@ def get_single_user(products_id):
 
 
 @app.route('/pressure', methods=['GET'])
+@jwt_required
 def get_single_all_data():
 
     return jsonify(data)

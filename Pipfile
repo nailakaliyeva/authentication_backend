@@ -17,6 +17,7 @@ flask-cors = "*"
 gunicorn = "*"
 mysqlclient = "*"
 requests = "*"
+flask-jwt-simple = "*"
 
 [requires]
 python_version = "3.7.2"

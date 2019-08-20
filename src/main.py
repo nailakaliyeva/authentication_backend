@@ -82,43 +82,43 @@ def handle_orders():
     if request.method == 'POST':
         body = request.get_json()
 
-    if body is None:
-        raise APIException("You need to specify the request body as a json object", status_code=400)
-    if 'username' not in body:
-        raise APIException('You need to specify the username', status_code=400)
-    if 'purchase_date' not in body:
-        raise APIException('You need to specify the purchase_date', status_code=400)
-    if 'confirmation_number' not in body:
-        raise APIException('You need to specify the confirmation_number', status_code=400)
-    if 'user_id' not in body:
-        raise APIException('You need to specify the user_id', status_code=400)
-    if 'products' not in body:
-        raise APIException('You need to specify the products', status_code=400)
-
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if 'username' not in body:
+            raise APIException('You need to specify the username', status_code=400)
+        if 'purchase_date' not in body:
+            raise APIException('You need to specify the purchase_date', status_code=400)
+        if 'confirmation_number' not in body:
+            raise APIException('You need to specify the confirmation_number', status_code=400)
+        if 'user_id' not in body:
+            raise APIException('You need to specify the user_id', status_code=400)
+        if 'products' not in body:
+            raise APIException('You need to specify the products', status_code=400)
+    return "Invalid Method", 404
 
 @app.route('/products', methods=[ 'GET', 'POST'])
 def handle_products():
-
+    
     if request.method == 'POST':
         body = request.get_json()
 
-    if body is None:
-        raise APIException("You need to specify the request body as a json object", status_code=400)
-    if 'plan_name' not in body:
-        raise APIException('You need to specify the plan_name', status_code=400)
-    if 'price' not in body:
-        raise APIException('You need to specify the price', status_code=400)
-    if 'orders_id' not in body:
-        raise APIException('You need to specify the orders_id', status_code=400)
-    if 'mag_f' not in body:
-        raise APIException('You need to specify the mag_f', status_code=400)
-    if 'temp' not in body:
-        raise APIException('You need to specify the temp', status_code=400)
-    if 'atmo_pressure' not in body:
-        raise APIException('You need to specify the atmo_pressure', status_code=400)
-    if 'axis_measure' not in body:
-        raise APIException('You need to specify the axis_measure', status_code=400)
-    return "Invalid Method", 404
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if 'plan_name' not in body:
+            raise APIException('You need to specify the plan_name', status_code=400)
+        if 'price' not in body:
+            raise APIException('You need to specify the price', status_code=400)
+        if 'orders_id' not in body:
+            raise APIException('You need to specify the orders_id', status_code=400)
+        if 'mag_f' not in body:
+            raise APIException('You need to specify the mag_f', status_code=400)
+        if 'temp' not in body:
+            raise APIException('You need to specify the temp', status_code=400)
+        if 'atmo_pressure' not in body:
+            raise APIException('You need to specify the atmo_pressure', status_code=400)
+        if 'axis_measure' not in body:
+            raise APIException('You need to specify the axis_measure', status_code=400)
+        return "Invalid Method", 404
 
     if request.method == 'GET':
         all_products = Products.query.all()
